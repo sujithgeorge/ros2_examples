@@ -1,1 +1,0 @@
-/home/sujith/projects/ros2/off_1/build/robot_bringup/ament_cmake_environment_hooks/local_setup.bash
