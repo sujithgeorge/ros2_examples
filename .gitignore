@@ -1,0 +1,7 @@
+# Editor / IDE
+.vscode/
+
+# ROS 2 colcon workspace outputs (per example workspace root)
+build/
+install/
+log/
