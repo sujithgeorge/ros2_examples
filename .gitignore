@@ -5,3 +5,7 @@
 build/
 install/
 log/
+
+# clangd
+.cache/
+
