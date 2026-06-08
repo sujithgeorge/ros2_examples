@@ -20,6 +20,7 @@ diff_drive_controller:
 
     pose_covariance_diagonal: [0.001, 0.001, 0.001, 0.001, 0.001, 0.01]
     twist_covariance_diagonal: [0.001, 0.001, 0.001, 0.001, 0.001, 0.01]
+    use_stamped_vel: true
 
     enable_odom_tf: true
     publish_rate: 50.0
