@@ -9,7 +9,7 @@ sudo apt install ros-jazzy-gz-ros2-control
 Launch Gazebo with the robot:
 
 ```bash
-ros2 launch my_robot_bringup my_robot.launch.py
+ros2 launch my_robot_bringup my_robot.launch.xml
 ```
 
 ## Moving the robot
