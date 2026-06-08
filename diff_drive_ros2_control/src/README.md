@@ -6,6 +6,8 @@ Build, source, launch as usual. Then give velocity command via keyboard using te
 $ ros2 run teleop_twist_keyboard teleop_twist_keyboard --ros-args -r /cmd_vel:=/diff_drive_controller/cmd_vel -p stamped:=true
 ```
 
+Note that we remap the /cmd_vel to /diff_drive_controller/cmd_vel, reasons explained further below.
+
 ## ros2 control commands that can be helpful in the context of this demo
 
 ```bash
@@ -19,7 +21,7 @@ If you did not gracefully exit a previous launch, some stray controllers (or som
 
 You know this when you see in the console:
 
-> "Could not configure controller with name 'joint_state_broadcaster' because no controller with this name exists"
+> "Controller with name 'joint_state_broadcaster' already exists"
 
 If so, run the 'ros2 control list_controllers'. The stray ones will appear, and you may have to kill them all.
 
@@ -27,12 +29,12 @@ If so, run the 'ros2 control list_controllers'. The stray ones will appear, and 
 
 ## Flow:
 
-### 1. In the ros2_control xacro file: mobile_base.ros2_control.xacro, we have a <ros2_control> tag as the second outermost (outermost being <robot>). Then inside it, in the <hardware> tag, we define the plugin which is a mock plugin.
+### 1. In the ros2_control xacro file: mobile_base.ros2_control.xacro, we have a <ros2_control> tag as the second outermost. Then inside it, in the <hardware> tag, we define the plugin which is a mock plugin.
 
 ```xml
 <hardware>
-<plugin>mock_components/GenericSystem</plugin>
-<param name="calculate_dynamics">true</param>
+    <plugin>mock_components/GenericSystem</plugin>
+    <param name="calculate_dynamics">true</param>
 </hardware>
 ```
 
@@ -41,7 +43,7 @@ The calculate_dynamics true means that the encoders will return the velocity (wh
 Then we have two joint tags , one for each wheel.
 
 ```xml
-<joint name="base_right_wheel_joint">
+    <joint name="base_right_wheel_joint">
         <command_interface name="velocity"/>
         <state_interface name="velocity"/>
         <state_interface name="position"/>
@@ -61,45 +63,45 @@ For each wheel, the command_interface is what we give it, and the state_interfac
 
 ```yaml
 controller_manager:
-    ros__parameters:
-        update_rate: 50
+  ros__parameters:
+    update_rate: 50
 ```
 
 The update_rate: 50 means a 50 Hz read → update → write loop in controller_manager, which ties mock hardware, both controllers, and timing together.
 
-**my_robot_controllers.yaml** — passed to the spawner via `--param-file`. Each controller block includes its `type` and runtime params (Jazzy pattern; do not put controller types on `ros2_control_node`):
+**my_robot_controllers.yaml** — passed to the spawner via `--param-file`. Each controller block includes its `type` and params
 
 ```yaml
 joint_state_broadcaster:
-    ros__parameters:
-        type: joint_state_broadcaster/JointStateBroadcaster
-        joints:
-          - base_left_wheel_joint
-          - base_right_wheel_joint
+  ros__parameters:
+    type: joint_state_broadcaster/JointStateBroadcaster
+    joints:
+      - base_left_wheel_joint
+      - base_right_wheel_joint
 
 diff_drive_controller:
-    ros__parameters:
-        type: diff_drive_controller/DiffDriveController
+  ros__parameters:
+    type: diff_drive_controller/DiffDriveController
 
-        left_wheel_names: ["base_left_wheel_joint"]
-        right_wheel_names: ["base_right_wheel_joint"]
+    left_wheel_names: ["base_left_wheel_joint"]
+    right_wheel_names: ["base_right_wheel_joint"]
 
-        wheel_separation: 0.45
-        wheel_radius: 0.1
+    wheel_separation: 0.45
+    wheel_radius: 0.1
 
-        odom_frame_id: "odom"
-        base_frame_id: "base_footprint"
+    odom_frame_id: "odom"
+    base_frame_id: "base_footprint"
 
-        pose_covariance_diagonal: [0.001, 0.001, 0.001, 0.001, 0.001, 0.01]
-        twist_covariance_diagonal: [0.001, 0.001, 0.001, 0.001, 0.001, 0.01]
+    pose_covariance_diagonal: [0.001, 0.001, 0.001, 0.001, 0.001, 0.01]
+    twist_covariance_diagonal: [0.001, 0.001, 0.001, 0.001, 0.001, 0.01]
 
-        enable_odom_tf: true
-        publish_rate: 50.0
+    enable_odom_tf: true
+    publish_rate: 50.0
 
-        linear.x.max_velocity: 1.0
-        linear.x.min_velocity: -1.0
-        angular.z.max_velocity: 1.0
-        angular.z.min_velocity: -1.0
+    linear.x.max_velocity: 1.0
+    linear.x.min_velocity: -1.0
+    angular.z.max_velocity: 1.0
+    angular.z.min_velocity: -1.0
 ```
 
 Source code for both JointStateBroadcaster and DiffDriveController is available on the github repo: ros-controls/ros2_controllers.
@@ -112,12 +114,10 @@ Source code for both JointStateBroadcaster and DiffDriveController is available 
 4. It also calculates the odom, i.e. how much the robot would have moved from its original position. To do this, it 'reads' the state given back by the real / mock encoders. (Remember we defined <state_interface name="velocity"/> and <state_interface name="position"/> in the mock hardware setup in mobile_base.ros2_control.xacro). It uses this along with the wheel_separation and wheel_radius to calculate odom. We also need to define the odom_frame_id and the base_frame_id.
 5. We have set enable_odom_tf: true. As a result of this, it will publish the odom to base frame tf. (The base frame name in this demo is base_footprint). The publish frequency is defined by publish_rate. Please note that the publish_rate is on individual controller level, but the update_rate is at a global level. The update_rate is the control loop rate.
 
-For the JointStateBroadcaster, we select specific joints in my_robot_controllers.yaml (see above). If the `joints` list is omitted, JointStateBroadcaster publishes all available joint interfaces by default.
-
 #### The main functions of the JointStateBroadcaster are:
 
 1. 'Read' the state given back by the real / mock encoders. (Remember we defined <state_interface name="velocity"/> and <state_interface name="position"/> in the mock hardware setup in mobile_base.ros2_control.xacro). It is to be noted that DiffDriveController also reads the same. So whatever state_interface published by the mock / real hardware can be read by one or more controllers.
-2. Publish the state to /joint_states. The robot_state_publisher would then read these /joint_states and publish the /tf. Along with this, the DiffDriveController will publish the odom to base frame (base_footprint in this demo) to /tf as well. All this combined will cause RViz to show the movement visual. The joint_states make the wheels rotate and the odom makes the robot move. Make sure you choose the fixed frame as odom in RViz.
+2. Publish the state to /joint_states. For the JointStateBroadcaster, we select specific joints in my_robot_controllers.yaml (see yaml above). If the `joints` list is omitted, JointStateBroadcaster publishes all available joint interfaces by default. The robot_state_publisher would then read these /joint_states and publish the /tf. Along with this, the DiffDriveController will publish the odom to base frame (base_footprint in this demo) to /tf as well. All this combined will cause RViz to show the movement visual. The joint_states make the wheels rotate and the odom makes the robot move. Make sure you choose the fixed frame as odom in RViz.
 
 ---
 
