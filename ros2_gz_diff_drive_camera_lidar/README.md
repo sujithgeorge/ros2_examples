@@ -1,5 +1,3 @@
-# diff_drive_gz_camera
-
 ## How to run
 
 Build, source, launch as usual. Then give velocity command via keyboard using teleop_twist_keyboard as below:
