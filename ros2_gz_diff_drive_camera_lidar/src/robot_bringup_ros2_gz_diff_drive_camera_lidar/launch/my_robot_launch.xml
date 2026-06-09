@@ -1,9 +1,9 @@
 <?xml version="1.0"?>
 <launch>
-  <let name="urdf_file_path" value="$(find-pkg-share gz_camera_description)/urdf/my_robot.urdf.xacro"/>
-  <let name="rviz_config_file_path" value="$(find-pkg-share gz_camera_description)/rviz/rviz-saved-config.rviz"/>
-  <let name="bridge_config_file_path" value="$(find-pkg-share gz_camera_bringup)/config/bridge.yaml"/>
-  <let name="gazebo_world_file_path" value="$(find-pkg-share gz_camera_bringup)/config/gazebo_world.sdf"/>
+  <let name="urdf_file_path" value="$(find-pkg-share robot_description_ros2_gz_diff_drive_camera_lidar)/urdf/my_robot.urdf.xacro"/>
+  <let name="rviz_config_file_path" value="$(find-pkg-share robot_description_ros2_gz_diff_drive_camera_lidar)/rviz/rviz-saved-config.rviz"/>
+  <let name="bridge_config_file_path" value="$(find-pkg-share robot_bringup_ros2_gz_diff_drive_camera_lidar)/config/bridge.yaml"/>
+  <let name="gazebo_world_file_path" value="$(find-pkg-share robot_bringup_ros2_gz_diff_drive_camera_lidar)/config/gazebo_world.sdf"/>
 
   <node pkg="robot_state_publisher" exec="robot_state_publisher">
     <param name="robot_description" value="$(command 'xacro $(var urdf_file_path)')"/>
