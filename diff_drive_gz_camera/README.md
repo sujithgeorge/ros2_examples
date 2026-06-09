@@ -30,14 +30,14 @@ $ ros2 run teleop_twist_keyboard teleop_twist_keyboard
 
    ```xml
    <gazebo>
-   <plugin filename="gz-sim-diff-drive-system" name="gz::sim::systems::DiffDrive">
-   <left_joint>base_left_wheel_joint</left_joint>
-   <right_joint>base_right_wheel_joint</right_joint>
-   <wheel_separation>0.45</wheel_separation>
-   <wheel_radius>0.1</wheel_radius>
-   <frame_id>odom</frame_id>
-   <child_frame_id>base_footprint</child_frame_id>
-   </plugin>
+       <plugin filename="gz-sim-diff-drive-system" name="gz::sim::systems::DiffDrive">
+           <left_joint>base_left_wheel_joint</left_joint>
+           <right_joint>base_right_wheel_joint</right_joint>
+           <wheel_separation>0.45</wheel_separation>
+           <wheel_radius>0.1</wheel_radius>
+           <frame_id>odom</frame_id>
+           <child_frame_id>base_footprint</child_frame_id>
+       </plugin>
    </gazebo>
    ```
 
@@ -59,10 +59,10 @@ $ ros2 run teleop_twist_keyboard teleop_twist_keyboard
 
    ```xml
    <gazebo>
-   <plugin filename="gz-sim-joint-state-publisher-system" name="gz::sim::systems::JointStatePublisher">
-   <joint_name>base_left_wheel_joint</joint_name>
-   <joint_name>base_right_wheel_joint</joint_name>
-   </plugin>
+       <plugin filename="gz-sim-joint-state-publisher-system" name="gz::sim::systems::JointStatePublisher">
+           <joint_name>base_left_wheel_joint</joint_name>
+           <joint_name>base_right_wheel_joint</joint_name>
+       </plugin>
    </gazebo>
    ```
 
@@ -100,9 +100,9 @@ The camera feed happens in a parallel flow as below.
 
    ```xml
    <gazebo>
-   <plugin filename="gz-sim-sensors-system" name="gz::sim::systems::Sensors">
-   <render_engine>ogre</render_engine>
-   </plugin>
+       <plugin filename="gz-sim-sensors-system" name="gz::sim::systems::Sensors">
+           <render_engine>ogre</render_engine>
+       </plugin>
    </gazebo>
    ```
 
@@ -110,21 +110,19 @@ The camera feed happens in a parallel flow as below.
 
    ```xml
    <gazebo reference="camera_link">
-   <sensor type="camera" name="camera">
-   <camera>
-   <horizontal_fov>1.3962634</horizontal_fov>
-   ......
-   ........
-   <optical_frame_id>camera_link_optical</optical_frame_id>
-   <camera_info_topic>camera/camera_info</camera_info_topic>
-   </camera>
-   <always_on>1</always_on>
-   <update_rate>20</update_rate>
-   <visualize>true</visualize>
-   <topic>camera/image_raw</topic>
-
+       <sensor type="camera" name="camera">
+           <camera>
+               <horizontal_fov>1.3962634</horizontal_fov>
+               ......
+               ........
+               <optical_frame_id>camera_link_optical</optical_frame_id>
+               <camera_info_topic>camera/camera_info</camera_info_topic>
+           </camera>
+           <always_on>1</always_on>
+           <update_rate>20</update_rate>
+           <visualize>true</visualize>
+           <topic>camera/image_raw</topic>
        </sensor>
-
    </gazebo>
    ```
 
@@ -132,7 +130,7 @@ The camera feed happens in a parallel flow as below.
 
    ```xml
    <link name="camera_link">
-      ......
+       ......
    </link>
 
    <joint name="base_camera_joint" type="fixed">
@@ -180,7 +178,7 @@ The lidar point cloud happens in a parallel flow as below.
 
    ```xml
    <link name="lidar_link">
-      ......
+       ......
    </link>
 
    <joint name="base_lidar_joint" type="fixed">
@@ -194,32 +192,32 @@ The lidar point cloud happens in a parallel flow as below.
 
    ```xml
    <gazebo reference="lidar_link">
-   <sensor type="gpu_lidar" name="lidar">
-   <topic>lidar</topic>
-   <update_rate>10</update_rate>
-   <lidar>
-   <scan>
-   <horizontal>
-   <samples>640</samples>
-   ......
-   <min_angle>-3.14159</min_angle>
-   <max_angle>3.14159</max_angle>
-   </horizontal>
-   <vertical>
-   <samples>16</samples>
-   ......
-   <min_angle>-0.261799</min_angle>
-   <max_angle>0.261799</max_angle>
-   </vertical>
-   </scan>
-   <range>
-   <min>0.08</min>
-   <max>10.0</max>
-   </range>
-   </lidar>
-   <always_on>1</always_on>
-   <visualize>true</visualize>
-   </sensor>
+       <sensor type="gpu_lidar" name="lidar">
+           <topic>lidar</topic>
+           <update_rate>10</update_rate>
+           <lidar>
+               <scan>
+                   <horizontal>
+                       <samples>640</samples>
+                       ......
+                       <min_angle>-3.14159</min_angle>
+                       <max_angle>3.14159</max_angle>
+                   </horizontal>
+                   <vertical>
+                       <samples>16</samples>
+                       ......
+                       <min_angle>-0.261799</min_angle>
+                       <max_angle>0.261799</max_angle>
+                   </vertical>
+               </scan>
+               <range>
+                   <min>0.08</min>
+                   <max>10.0</max>
+               </range>
+           </lidar>
+           <always_on>1</always_on>
+           <visualize>true</visualize>
+       </sensor>
    </gazebo>
    ```
 
@@ -253,25 +251,24 @@ We launch the robot_state_publisher and give it the URDF file.
 
 ```xml
 <node pkg="robot_state_publisher" exec="robot_state_publisher">
-
-<param name="robot_description" value="$(command 'xacro $(var urdf_file_path)')"/>
+    <param name="robot_description" value="$(command 'xacro $(var urdf_file_path)')"/>
 </node>
 ```
 
 We launch gazebo simulation as below. Note that the world file that we give gazebo is almost like the Gazebo empty world sdf file. We just added a dining table object to it and saved the sdf so that we don't have to do it each time. The ros-gz-sim package folder is inside /opt/ros/jazzy/share usually. The find-pkg-share will find it.
 
 ```xml
-  <include file="$(find-pkg-share ros_gz_sim)/launch/gz_sim.launch.py">
+<include file="$(find-pkg-share ros_gz_sim)/launch/gz_sim.launch.py">
     <arg name="gz_args" value="$(var gazebo_world_file_path) -r"/>
-  </include>
+</include>
 ```
 
 This is the bridge between ROS2 and gazebo and the configuration is done in bridge.yaml
 
 ```xml
-  <node pkg="ros_gz_bridge" exec="parameter_bridge">
+<node pkg="ros_gz_bridge" exec="parameter_bridge">
     <param name="config_file" value="$(var bridge_config_file_path)"/>
-  </node>
+</node>
 ```
 
 This is the part which spawns the robot model inside gazebo sim.
