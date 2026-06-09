@@ -123,8 +123,64 @@ The camera feed happens in a parallel flow as below.
       gz_type_name: "gz.msgs.Image"
       direction: GZ_TO_ROS
 
+The lidar point cloud happens in a parallel flow as below.
+
+1.  In lidar.xacro we have defined the lidar link and mounted it on top of base_link as below:
+
+    <link name="lidar_link">
+       ......
+    </link>
+
+    <joint name="base_lidar_joint" type="fixed">
+        <parent link="base_link" />
+        <child link="lidar_link" />
+        <origin xyz="0 0 ${base_height + lidar_height / 2.0}" rpy="0 0 0" />
+    </joint>
+
+2.  In the same lidar.xacro file, we also configure the gazebo gpu_lidar sensor as below:
+    <gazebo reference="lidar_link">
+    <sensor type="gpu_lidar" name="lidar">
+    <topic>lidar</topic>
+    <update_rate>10</update_rate>
+    <lidar>
+    <scan>
+    <horizontal>
+    <samples>640</samples>
+    ......
+    <min_angle>-3.14159</min_angle>
+    <max_angle>3.14159</max_angle>
+    </horizontal>
+    <vertical>
+    <samples>16</samples>
+    ......
+    <min_angle>-0.261799</min_angle>
+    <max_angle>0.261799</max_angle>
+    </vertical>
+    </scan>
+    <range>
+    <min>0.08</min>
+    <max>10.0</max>
+    </range>
+    </lidar>
+    <always_on>1</always_on>
+    <visualize>true</visualize>
+    </sensor>
+    </gazebo>
+
+    The gpu_lidar sensor uses the Sensors plugin that we already defined in camera.xacro. When we set the topic to lidar, Gazebo publishes the point cloud to the Gazebo topic lidar/points.
+    Then in the bridge yaml, we map this to the corresponding ROS2 topic as below:
+    - ros_topic_name: "/lidar/points"
+      gz_topic_name: "/lidar/points"
+      ros_type_name: "sensor_msgs/msg/PointCloud2"
+      gz_type_name: "gz.msgs.PointCloudPacked"
+      frame_id: "lidar_link"
+      direction: GZ_TO_ROS
+
+    The frame_id is set to lidar_link so that RViz can place the point cloud correctly in the TF tree.
+
    ## RViz configuration
-    In RViz, you can do 'Add' and in the 'By Display Type', you can choose 'Image'. For some reason, choosing Camera causes a flickering video.
+    For the camera, in RViz, you can do 'Add' and in the 'By Display Type', you can choose 'Image'. For some reason, choosing Camera causes a flickering video.
+    For the lidar, in RViz, you can do 'Add' and in the 'By Display Type', you can choose 'PointCloud2'. Set the topic to /lidar/points. Make sure the Fixed Frame is set to odom.
 
 ## Launch file
 
