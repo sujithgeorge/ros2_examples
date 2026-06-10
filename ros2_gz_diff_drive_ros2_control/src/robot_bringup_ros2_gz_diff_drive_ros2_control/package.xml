@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
 <package format="3">
-  <name>my_robot_bringup</name>
+  <name>robot_bringup_ros2_gz_diff_drive_ros2_control</name>
   <version>0.0.0</version>
   <description>TODO: Package description</description>
   <maintainer email="sujith@todo.todo">sujith</maintainer>
@@ -13,7 +13,7 @@
   <exec_depend>diff_drive_controller</exec_depend>
   <exec_depend>gz_ros2_control</exec_depend>
   <exec_depend>joint_state_broadcaster</exec_depend>
-  <exec_depend>my_robot_description</exec_depend>
+  <exec_depend>robot_bringup_ros2_gz_diff_drive_ros2_control_description</exec_depend>
   <exec_depend>robot_state_publisher</exec_depend>
   <exec_depend>ros_gz_bridge</exec_depend>
   <exec_depend>ros_gz_sim</exec_depend>
