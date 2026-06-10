@@ -22,8 +22,6 @@
 
   <node pkg="ros_gz_sim" exec="create" args="-topic /robot_description"/>
 
-  <!-- <node pkg="joint_state_publisher_gui" exec="joint_state_publisher_gui"/> -->
-
 
 
 </launch>
